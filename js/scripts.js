@@ -32,50 +32,55 @@
         const findPokemonByName = (name) => {
             return pokemonList.filter(pokemon => pokemon.name.toLowerCase() === name.toLowerCase());
         };
-        
+
+        // make a list of pokemon inside ul 
+        function addListItem(pokemon) {
+            let pokemonList = document.querySelector('.pokemon-list');
+            let listItem = document.createElement('li');
+            let button = document.createElement('button');
+            button.innerText = pokemon.name;
+            button.classList.add('pokemon-button');
+            pokemonList.appendChild(listItem); 
+            listItem.appendChild(button);
+            // log the pokemon name when the button is clicked 
+            showDetails(button,pokemon)
+            
+        }
+
+        //listen to the events and log the pokemon name when the button is clicked
+        function showDetails(button, pokemon) {
+            button.addEventListener('click', function() {
+                console.log(pokemon.name);
+            })
+            
+        }
 
 
         return{
             add: add,
             getAll: getAll,
-           findPokemonByName: findPokemonByName
+           findPokemonByName: findPokemonByName,
+           addListItem: addListItem,
+           showDetails: showDetails
             
         }
 
     })();
 
-    // searching for a pokemon
-    const result = pokemonRepository.findPokemonByName('charizard');
+    // searching for a pokemon (Enter the name between the breaks)
+    const result = pokemonRepository.findPokemonByName('');
         
     if (result.length > 0) {
-        console.log('Found Pokémon:', result[0]);
+        console.log('Found Pokemon:', result[0]);
     } else {
-        console.log('Pokémon not found.');
+        console.log('Pokemon not found.');
     } 
-  
     //adding new pokemon 
     pokemonRepository.add({name: 'Squirtle', height: 5, types: ['Squirtle']});
 
-    
-    // looping through the repo and type the results on the html page
-    document.write("<h3> === forLoop === </h3>")
-     for(let i=0; i<pokemonRepository.getAll().length; i++) {
-        if(pokemonRepository.getAll()[i].height > 7){    
-    document.write( (pokemonRepository.getAll()[i].name + ' height ( ' + pokemonRepository.getAll()[i].height + ') Wow that is big <br>'))
-        }
-        else{
-            document.write((pokemonRepository.getAll()[i].name + ' height ( ' + pokemonRepository.getAll()[i].height + ' ) <br>'))
-        }
-    } 
-
-    document.write("<h3> === forEach Loop === </h3>")
+    //looping throug the pokemons using forEachLoop
     pokemonRepository.getAll().forEach(function (pokemon) {
-        if(pokemon.height > 7){    
-            document.write( (pokemon.name + ' height ( ' + pokemon.height + ') Wow that is big <br>'))
-                }
-                else{
-                    document.write((pokemon.name + ' height ( ' + pokemon.height + ' ) <br>'))
-                }
+        pokemonRepository.addListItem(pokemon);
     }) 
 
 
