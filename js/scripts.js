@@ -7,17 +7,77 @@
 
         let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=20';
 
+        // creating a modal to view the pokemon info
+        let modalContainer = document.querySelector('#modal-container'); 
+        let dialogPromiseReject; // This can be set later
+
+        function showModal(pokemon){
+            modalContainer.innerHTML = '';
+            let modal = document.createElement('div');
+            modal.classList.add('modal');
+            // Add the new modal content
+            let closeButtonElement = document.createElement('button');
+            closeButtonElement.classList.add('modal-close');
+            closeButtonElement.innerText = 'Close';
+            closeButtonElement.addEventListener('click', hideModal);
+
+            let titleElement = document.createElement('h1');
+            titleElement.innerText = pokemon.name;
+
+            let contentElement = document.createElement('p');
+            contentElement.innerText = pokemon.name + ' is ' + pokemon.height + ' height' ;
+
+            let imageElement = document.createElement("img");
+            imageElement.src = pokemon.imageUrl
+            imageElement.setAttribute("width", "304");
+            imageElement.setAttribute("height", "228");
+            imageElement.setAttribute("alt", "The team logo"); 
+
+
+            modal.appendChild(closeButtonElement);
+            modal.appendChild(titleElement);
+            modal.appendChild(contentElement);
+            modal.appendChild(imageElement);
+            modalContainer.appendChild(modal);
+
+            modalContainer.classList.add('is-visible');
+
+        }
+        //  hide the modal function 
+        function hideModal() {
+            modalContainer.classList.remove('is-visible');
+            if(dialogPromiseReject) {
+                dialogPromiseReject();
+                dialogPromiseReject = null;
+            }
+        }
+
+
+        // close the  modal if the user clicked Escape 
+        window.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape' && modalContainer.classList.contains('is-visible')){
+                hideModal();
+            }
+        });
+
+        // close the modal if the user clicked outside the modal 
+        modalContainer.addEventListener('click', (e) => {
+           let target = e.target;
+           if(target === modalContainer) {
+            hideModal();
+           }
+        });
+
+
         function add(pokemon){
             if(typeof pokemon === 'object' && 'name' in pokemon ) {
                 return pokemonList.push(pokemon)
                
             } else {
                  
-            return document.write('<p> not object</p>')
+            return document.write('<p> not an object</p>')
             }
-        }
-
-
+        }     
 
         // get all pokemons
         function getAll() {
@@ -26,9 +86,11 @@
         // check if the new pokemon is an object and has the whole keys before adding it
 
         function loadList() {
+           
             return fetch(apiUrl).then(function(response) {
                 return response.json();
             }).then(function(json) {
+               
                 json.results.forEach(function(item) {
                     let pokemon = {
                         name: item.name,
@@ -38,24 +100,30 @@
                     console.log(pokemon);
                 });
             }).catch(function(e) {
+                
                 console.error(e)
             })
         }
+
+  
                 // load the pokemon details
                 function loadDetails(item) {
+           
                     let url = item.detailsUrl;
                     return fetch(url).then(function(response) {
+                        
                         return response.json();
                     }).then(function(details) {
                         // add the details to the item 
-                        item.imageUrl = details.sprites.fron_default;
+                        item.imageUrl = details.sprites.front_default;
                         item.height = details.height;
                         item.types = details.types;
                     }).catch(function(e) {
+              
                         console.error(e)
                     })
-        
-                }
+
+                } 
 
 
         // filter the pokemons by the name
@@ -79,15 +147,16 @@
 
         //listen to the events and log the pokemon name when the button is clicked
         function showDetails(button, pokemon) {   
-            let container = document.querySelector('.container');  
             button.addEventListener('click', function() {
                 loadDetails(pokemon).then(function() {
-                    console.log(pokemon);
-                    container.innerText = (pokemon.name);  
+                    showModal(pokemon);
+                    
                 })
                 
-             });   
-        }
+             });       
+        } 
+
+        
 
 
 
@@ -99,7 +168,8 @@
            addListItem: addListItem,
            showDetails: showDetails,
            loadList:loadList,
-           loadDetails: loadDetails
+           loadDetails: loadDetails,
+           showModal:showModal
            
             
         }
